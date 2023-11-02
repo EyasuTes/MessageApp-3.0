@@ -3,7 +3,7 @@ Content-Type: application/json
 
 {
     "name":"eyasu",
-    "email":"12233@gmail.com",
+    "email":"s@gmail.com",
     "password":"123"
 }
 ###
@@ -12,6 +12,16 @@ Content-Type: application/json
 
 {
     
-    "email":"12233@gmail.com",
-    "password":"123"
+    "email":"eyasu@bla",
+    "password":"12345"
+}
+###
+GET http://localhost:3001/api/user
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1M2ZjMDMwODRkZWNiZmE5Njg3ZDFhMCIsImlhdCI6MTY5ODgwMDU1NCwiZXhwIjoxNjk4ODA0MTU0fQ.sH34VvY_829TaYLfNxY7I026erZOQWkwq22j_Pk3HOE
+
+{
+    
+    "email":"eyasu@bla",
+    "password":"12345"
 }
