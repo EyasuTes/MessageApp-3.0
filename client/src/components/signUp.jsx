@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -26,21 +26,22 @@ export default function SignUp({ setIsRegistered }) {
           "Content-type": "application/json",
         },
       };
-      const { data } = await axios.post(
-        "http://localhost:3001/api/user",
-        {
-          name: username,
-          email,
-          password,
-          pic: pics,
-        },
-        config
-      );
-      console.log(data);
-
-      localStorage.setItem("userInfo", JSON.stringify(data));
-
-      navigate("/chats");
+      await axios
+        .post(
+          "http://localhost:3001/api/user",
+          {
+            name: username,
+            email,
+            password,
+            pic: pics,
+          },
+          config
+        )
+        .then((responce) => {
+          console.log(responce);
+          localStorage.setItem("userInfo", JSON.stringify(responce.data));
+          navigate("/chats");
+        });
     } catch (error) {
       console.log(error);
     }
@@ -63,6 +64,7 @@ export default function SignUp({ setIsRegistered }) {
       })
         .then((res) => res.json())
         .then((data) => {
+          console.log(data.url.toString());
           setPics(data.url.toString());
         })
         .catch((err) => {

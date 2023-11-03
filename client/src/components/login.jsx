@@ -27,7 +27,7 @@ export default function SignUp({ setIsRegistered }) {
       );
       console.log(data);
 
-      localStorage.setItem("userInfo", JSON.stringify(data));
+      await localStorage.setItem("userInfo", JSON.stringify(data));
 
       navigate("/chats");
     } catch (error) {

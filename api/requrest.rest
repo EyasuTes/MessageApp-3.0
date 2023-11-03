@@ -2,9 +2,9 @@ POST http://localhost:3001/api/user
 Content-Type: application/json
 
 {
-    "name":"eyasu",
-    "email":"s@gmail.com",
-    "password":"123"
+    "name":"snit",
+    "email":"2@gmail.com",
+    "password":"12345"
 }
 ###
 POST http://localhost:3001/api/user/login
@@ -12,7 +12,7 @@ Content-Type: application/json
 
 {
     
-    "email":"eyasu@bla",
+    "email":"1@gmail.com",
     "password":"12345"
 }
 ###
