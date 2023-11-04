@@ -6,16 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { useChatCart } from "../context/context";
 
 export default function ChatPage() {
-  const { getUser } = useChatCart();
+  const { getUser, setChats } = useChatCart();
   const navigate = useNavigate();
-  const [chats, setChats] = useState([]);
 
   const fetchChats = async () => {
     const api = import.meta.env.VITE_API_KEY;
     let user = getUser();
     if (user) {
-      console.log(user);
-
       const token = user.token;
       const headers = {
         Authorization: `Bearer ${token}`,
@@ -40,7 +37,7 @@ export default function ChatPage() {
   }, []);
   return (
     <div style={{ height: "93vh" }} className="flex w-full ">
-      <Sidebar chats={chats}></Sidebar>
+      <Sidebar></Sidebar>
       <ChatBox></ChatBox>
     </div>
   );

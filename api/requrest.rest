@@ -2,8 +2,8 @@ POST http://localhost:3001/api/user
 Content-Type: application/json
 
 {
-    "name":"snit",
-    "email":"2@gmail.com",
+    "name":"smon2",
+    "email":"22@gmail.com",
     "password":"12345"
 }
 ###
@@ -24,4 +24,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1M2ZjMDMwO
     
     "email":"eyasu@bla",
     "password":"12345"
+}
+###
+post http://localhost:3001/api/message
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1NDNlZDMwY2ZlMGRlMzM4YTM3MTE1YSIsImlhdCI6MTY5OTA1MTk3OSwiZXhwIjoxNjk5MTM4Mzc5fQ.lY6K0fIv6ylo1haim-LCT-_oDsZSyxOJxQGNMabUE_w
+
+{
+    "content":"hello",
+    "chatId": "6545681889d8dea972e9092b"
 }

@@ -1,9 +1,56 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { User, PaperPlaneRight } from "phosphor-react";
+import { useChatCart } from "../context/context";
+import axios from "axios";
+let selectedCompare, messagesCompare;
 
 export default function ChatBox() {
-  const convo = ["hello", "hi how are you", "i am good", "good"];
+  const { selected, api, getUser, setMessages, messages, socket } =
+    useChatCart();
+
   const [text, setText] = useState("");
+  const sendMessage = async () => {
+    let user = getUser();
+    if (user) {
+      const headers = {
+        Authorization: `Bearer ${user.token}`,
+        "content-type": "application/json",
+      };
+      const body = {
+        content: text,
+        chatId: selected,
+      };
+      await axios
+        .post(api + "/api/message", body, { headers })
+        .then((responce) => {
+          setMessages((preValue) => [...preValue, responce.data]);
+          socket.emit("message", responce.data, selected);
+        });
+    }
+  };
+  useEffect(() => {
+    selectedCompare = selected;
+    // messagesCompare = messages;
+  }, [selected]);
+  // function displayMessage(message) {
+
+  // }
+  useEffect(() => {
+    if (socket) {
+      socket.on("receive_message", (message) => {
+        if (selectedCompare) {
+          console.log(message.chat._id);
+          console.log(selectedCompare._id);
+          if (message.chat._id === selectedCompare._id) {
+            setMessages([...messages, message]);
+          }
+        }
+      });
+    }
+    return () => {
+      socket.off("message"); // detach the event listener when the component unmounts
+    };
+  });
   return (
     <div
       style={{ flex: 3 }}
@@ -16,10 +63,17 @@ export default function ChatBox() {
 
       <div className="flex-grow flex flex-col bg-blue-100 rounded-md">
         <div className="flex-grow rounded-md"></div>
-        {convo &&
-          convo.map((con, index) => (
-            <div className="text-right" key={index}>
-              {con}
+        {messages &&
+          messages.map((message, index) => (
+            <div
+              className={`${
+                getUser()._id === message.sender._id
+                  ? "text-right"
+                  : "text-left"
+              }`}
+              key={index}
+            >
+              {message.content}
             </div>
           ))}
 
@@ -33,7 +87,10 @@ export default function ChatBox() {
               setText(e.target.value);
             }}
           />
-          <div className="bg-blue-500 text-white rounded-md p-2 ">
+          <div
+            onClick={sendMessage}
+            className="bg-blue-500 text-white rounded-md p-2 "
+          >
             <PaperPlaneRight size={32} />
           </div>
         </div>

@@ -8,6 +8,7 @@ const userRoutes = require("./routes/userRoutes");
 const chatsRoutes = require("./routes/chatsRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const { notFound, errorHandler } = require("./middleware/errorHandler.js");
+const { Socket } = require("socket.io");
 
 dotenv.config();
 
@@ -22,4 +23,23 @@ app.use("/api/message", messageRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-app.listen(3001);
+const server = app.listen(3001);
+const io = require("socket.io")(server, {
+  pingTimeout: 60000,
+  cors: {
+    origin: "http://localhost:5173",
+    // credentials: true,
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log(socket.id);
+  socket.on("join_Room", (room) => {
+    socket.join(room);
+    console.log("joined room " + room);
+  });
+  socket.on("message", (message, selected) => {
+    console.log(message);
+    socket.to(selected._id).emit("receive_message", message);
+  });
+});

@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
+import io from "socket.io-client";
+const socket = io.connect("http://localhost:3001");
 
 const ChatContext = createContext({});
 
@@ -9,6 +11,9 @@ export function useChatCart() {
 
 export function ChatContextProvider({ children }) {
   const api = import.meta.env.VITE_API_KEY;
+  const [chats, setChats] = useState();
+  const [selected, setSelected] = useState("");
+  const [messages, setMessages] = useState([]);
 
   const getUser = () => {
     let user = localStorage.getItem("userInfo");
@@ -19,8 +24,27 @@ export function ChatContextProvider({ children }) {
       return;
     }
   };
-
+  useEffect(() => {
+    if (selected) {
+      const room = selected._id;
+      socket.emit("join_Room", room);
+    }
+  }, [selected]);
   return (
-    <ChatContext.Provider value={{ getUser }}>{children}</ChatContext.Provider>
+    <ChatContext.Provider
+      value={{
+        socket,
+        setMessages,
+        messages,
+        selected,
+        setSelected,
+        chats,
+        setChats,
+        getUser,
+        api,
+      }}
+    >
+      {children}
+    </ChatContext.Provider>
   );
 }

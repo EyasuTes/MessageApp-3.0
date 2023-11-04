@@ -7,7 +7,7 @@ export default function Navbar() {
   const [optionList, setOptionList] = useState();
   const [searching, setSearching] = useState("");
   const [focus, setFocus] = useState(false);
-  const { getUser } = useChatCart();
+  const { getUser, setChats } = useChatCart();
   const api = import.meta.env.VITE_API_KEY;
   useEffect(() => {
     searchUsers(searching);
@@ -22,7 +22,6 @@ export default function Navbar() {
       await axios
         .get(api + `/api/user?search=${e}`, { headers })
         .then((responce) => {
-          console.log(responce);
           setOptionList(responce.data);
         });
     }
@@ -40,7 +39,7 @@ export default function Navbar() {
       await axios
         .post(api + `/api/chats`, body, { headers })
         .then((responce) => {
-          console.log(responce);
+          setChats((prevArray) => [...prevArray, responce.data]);
         });
     }
   };
