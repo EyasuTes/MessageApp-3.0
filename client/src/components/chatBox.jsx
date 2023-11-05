@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import { User, PaperPlaneRight } from "phosphor-react";
 import { useChatCart } from "../context/context";
 import axios from "axios";
-let selectedCompare, messagesCompare;
+let selectedCompare;
 
 export default function ChatBox() {
-  const { selected, api, getUser, setMessages, messages, socket } =
+  const { selected, api, getUser, setMessages, messages, socket, contacts } =
     useChatCart();
+  const [userName, setUserName] = useState("");
 
+  // let userName;
   const [text, setText] = useState("");
   const sendMessage = async () => {
     let user = getUser();
@@ -30,11 +32,21 @@ export default function ChatBox() {
   };
   useEffect(() => {
     selectedCompare = selected;
-    // messagesCompare = messages;
   }, [selected]);
-  // function displayMessage(message) {
-
-  // }
+  useEffect(() => {
+    if (selected) {
+      if (selected.isGroupChat) {
+        setUserName(selected.chatName);
+      } else {
+        let user = selected.users.find((user) => user._id !== getUser()._id);
+        for (let i = 0; i < contacts.length; i++) {
+          if (contacts[i].phone === user.phone) {
+            setUserName(contacts[i].name);
+          }
+        }
+      }
+    }
+  });
   useEffect(() => {
     if (socket) {
       socket.on("receive_message", (message) => {
@@ -58,7 +70,7 @@ export default function ChatBox() {
     >
       <div className="flex gap-2 items-center p-2 ">
         <User size={32} />
-        <span>David</span>
+        <span>{userName}</span>
       </div>
 
       <div className="flex-grow flex flex-col bg-blue-100 rounded-md">

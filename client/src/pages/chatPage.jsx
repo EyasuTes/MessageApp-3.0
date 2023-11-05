@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useChatCart } from "../context/context";
 
 export default function ChatPage() {
-  const { getUser, setChats } = useChatCart();
+  const { getUser, setChats, setContacts } = useChatCart();
   const navigate = useNavigate();
 
   const fetchChats = async () => {
@@ -22,6 +22,15 @@ export default function ChatPage() {
       await axios.get(api + "/api/chats", { headers }).then((responce) => {
         if (responce.status === 200) {
           setChats(responce.data);
+        } else {
+          localStorage.removeItem("userInfo");
+          navigate("/");
+        }
+      });
+      await axios.get(api + "/api/contact", { headers }).then((responce) => {
+        if (responce.status === 200) {
+          console.log(responce.data);
+          setContacts(responce.data);
         } else {
           localStorage.removeItem("userInfo");
           navigate("/");

@@ -5,13 +5,13 @@ import { useNavigate } from "react-router-dom";
 export default function SignUp({ setIsRegistered }) {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [pics, setPics] = useState("");
 
   const handleSubmit = async () => {
-    if (!username || !email || !password || !confirmPassword) {
+    if (!username || !phone || !password || !confirmPassword) {
       console.log("fill all the requirements");
       return;
     }
@@ -19,7 +19,7 @@ export default function SignUp({ setIsRegistered }) {
       console.log("passwords do not match");
       return;
     }
-
+    console.log(phone, username, password);
     try {
       const config = {
         headers: {
@@ -31,7 +31,7 @@ export default function SignUp({ setIsRegistered }) {
           "http://localhost:3001/api/user",
           {
             name: username,
-            email,
+            phone,
             password,
             pic: pics,
           },
@@ -109,11 +109,11 @@ export default function SignUp({ setIsRegistered }) {
           />
           <input
             className="rounded-sm p-2 "
-            type="email"
-            placeholder="Enter Email"
-            value={email}
+            type="text"
+            placeholder="Enter phone"
+            value={phone}
             onChange={(e) => {
-              setEmail(e.target.value);
+              setPhone(e.target.value);
             }}
           />
           <input

@@ -2,8 +2,8 @@ POST http://localhost:3001/api/user
 Content-Type: application/json
 
 {
-    "name":"smon2",
-    "email":"22@gmail.com",
+    "name":"eyasu3",
+    "phone":"3",
     "password":"12345"
 }
 ###
@@ -33,4 +33,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1NDNlZDMwY
 {
     "content":"hello",
     "chatId": "6545681889d8dea972e9092b"
+}
+###
+post http://localhost:3001/api/chats
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1NDZlMGIxY2Q2MmYxYzg1Y2FmNDRjOCIsImlhdCI6MTY5OTE0ODA0NX0.UKMCNYKLmXNXrzcsqP5pC9eFBlXqFf3USgCwPXEIUaI
+
+{
+    "phone":"1"
 }

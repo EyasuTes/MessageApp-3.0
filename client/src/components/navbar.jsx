@@ -2,30 +2,32 @@ import React, { useEffect, useState } from "react";
 import { User, MagnifyingGlass } from "phosphor-react";
 import { useChatCart } from "../context/context";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
+  const navigate = useNavigate();
   const [optionList, setOptionList] = useState();
   const [searching, setSearching] = useState("");
   const [focus, setFocus] = useState(false);
   const { getUser, setChats } = useChatCart();
   const api = import.meta.env.VITE_API_KEY;
-  useEffect(() => {
-    searchUsers(searching);
-  }, [searching]);
-  const searchUsers = async (e) => {
-    let user = getUser();
-    if (user) {
-      const headers = {
-        Authorization: `Bearer ${user.token}`,
-        "content-type": "application/json",
-      };
-      await axios
-        .get(api + `/api/user?search=${e}`, { headers })
-        .then((responce) => {
-          setOptionList(responce.data);
-        });
-    }
-  };
+  // useEffect(() => {
+  //   searchUsers(searching);
+  // }, [searching]);
+  // const searchUsers = async (e) => {
+  //   let user = getUser();
+  //   if (user) {
+  //     const headers = {
+  //       Authorization: `Bearer ${user.token}`,
+  //       "content-type": "application/json",
+  //     };
+  //     await axios
+  //       .get(api + `/api/user?search=${e}`, { headers })
+  //       .then((responce) => {
+  //         setOptionList(responce.data);
+  //       });
+  //   }
+  // };
   const addChat = async (id) => {
     let user = getUser();
     const body = {
@@ -43,11 +45,15 @@ export default function Navbar() {
         });
     }
   };
+  function logout() {
+    localStorage.removeItem("userInfo");
+    navigate("/");
+  }
   return (
     <div className="relative flex justify-between p-2 border-4 border-blue-100 bg-white">
       <div className="text-xl flex items-center">
         <MagnifyingGlass size={32} />
-        <input
+        {/* <input
           value={searching}
           className="bg-gray-200"
           onChange={(e) => {
@@ -60,9 +66,9 @@ export default function Navbar() {
             setFocus(false);
           }}
           type="text"
-        />
+        /> */}
       </div>
-      <div
+      {/* <div
         className={`absolute top-14 left-10 bg-white w-24 ${
           searching === "" ? "hidden" : ""
         }`}
@@ -81,9 +87,14 @@ export default function Navbar() {
               <div>{option.name}</div>
             </div>
           ))}
-      </div>
+      </div> */}
       <div className="text-xl">Eyasu chat_app</div>
-      <div className="">
+      <div
+        onClick={() => {
+          logout();
+        }}
+        className=""
+      >
         <User size={32} />
       </div>
     </div>

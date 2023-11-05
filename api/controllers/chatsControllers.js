@@ -1,12 +1,17 @@
 const asyncHandler = require("express-async-handler");
 const Chat = require("../models/chatModel");
 const User = require("../models/userModel");
+const Contact = require("../models/contactModel");
 
 const accessChat = asyncHandler(async (req, res) => {
-  const { userID } = req.body;
+  const { phone } = req.body;
+  const user = await User.find({ phone });
+  console.log(user[0]._id);
+  const userID = user[0]._id;
   if (!userID) {
     return res.sendStatus(400);
   }
+
   let isChat = await Chat.find({
     isGroupChat: false,
     $and: [
@@ -19,7 +24,7 @@ const accessChat = asyncHandler(async (req, res) => {
 
   isChat = await User.populate(isChat, {
     path: "latestMessage.sender",
-    select: "name pic email",
+    select: "name pic phone",
   });
   if (isChat.length > 0) {
     res.send(isChat[0]);
@@ -36,6 +41,15 @@ const accessChat = asyncHandler(async (req, res) => {
         "users",
         "-password"
       );
+
+      // const createContact = await Contact.create({
+      //   name: contactName,
+      //   user: req.user._id,
+      //   chat: FullChat._id,
+      // });
+      // const FullContact = await Contact.findOne({
+      //   _id: createContact._id,
+      // }).populate("user", "chat", "-password");
       res.status(200).json(FullChat);
     } catch (error) {
       res.status(400);
@@ -53,7 +67,7 @@ const fetchChats = asyncHandler(async (req, res) => {
       .then(async (results) => {
         results = await User.populate(results, {
           path: "latestMessage.sender",
-          select: "name pic email",
+          select: "name pic phone",
         });
         res.status(200).send(results);
       });
@@ -67,11 +81,23 @@ const fetchChats = asyncHandler(async (req, res) => {
 //@route           POST /api/chat/group
 //@access          Protected
 const createGroupChat = asyncHandler(async (req, res) => {
-  if (!req.body.users || !req.body.name) {
+  const { members } = req.body;
+  let users = [];
+  let user;
+  if (members) {
+    for (let i = 0; i < members.length; i++) {
+      user = await User.findOne({ phone: members[i].phone });
+      if (user) {
+        users.push(user);
+      }
+    }
+  }
+
+  if (!users || !req.body.name) {
     return res.status(400).send({ message: "Please Fill all the feilds" });
   }
 
-  var users = JSON.parse(req.body.users);
+  // var users = JSON.parse(req.body.users);
 
   if (users.length < 2) {
     return res

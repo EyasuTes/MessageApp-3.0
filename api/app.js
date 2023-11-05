@@ -7,6 +7,7 @@ const mongodbConnect = require("./config/db.js");
 const userRoutes = require("./routes/userRoutes");
 const chatsRoutes = require("./routes/chatsRoutes");
 const messageRoutes = require("./routes/messageRoutes");
+const contactRoutes = require("./routes/contactRoutes");
 const { notFound, errorHandler } = require("./middleware/errorHandler.js");
 const { Socket } = require("socket.io");
 
@@ -19,6 +20,7 @@ mongodbConnect();
 app.use("/api/user", userRoutes);
 app.use("/api/chats", chatsRoutes);
 app.use("/api/message", messageRoutes);
+app.use("/api/contact", contactRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

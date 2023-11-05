@@ -3,11 +3,11 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 export default function SignUp({ setIsRegistered }) {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = async () => {
-    if (!email || !password) {
+    if (!phone || !password) {
       console.log("fill all value");
       return;
     }
@@ -20,7 +20,7 @@ export default function SignUp({ setIsRegistered }) {
       const { data } = await axios.post(
         "http://localhost:3001/api/user/login",
         {
-          email,
+          phone,
           password,
         },
         config
@@ -62,11 +62,11 @@ export default function SignUp({ setIsRegistered }) {
         <div className="flex flex-col gap-2 text-xl">
           <input
             className="rounded-sm p-2 "
-            type="email"
-            placeholder="Enter Email"
-            value={email}
+            type="phone"
+            placeholder="Enter phone"
+            value={phone}
             onChange={(e) => {
-              setEmail(e.target.value);
+              setPhone(e.target.value);
             }}
           />
           <input

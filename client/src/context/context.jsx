@@ -14,6 +14,7 @@ export function ChatContextProvider({ children }) {
   const [chats, setChats] = useState();
   const [selected, setSelected] = useState("");
   const [messages, setMessages] = useState([]);
+  const [contacts, setContacts] = useState([]);
 
   const getUser = () => {
     let user = localStorage.getItem("userInfo");
@@ -33,6 +34,8 @@ export function ChatContextProvider({ children }) {
   return (
     <ChatContext.Provider
       value={{
+        contacts,
+        setContacts,
         socket,
         setMessages,
         messages,

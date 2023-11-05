@@ -3,19 +3,19 @@ const User = require("../models/userModel");
 const generateToken = require("../config/generateToken");
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password, pic } = req.body;
-  if (!name || !email || !password) {
+  const { name, phone, password, pic } = req.body;
+  if (!name || !phone || !password) {
     res.status(400);
     throw new Error("Please Enter all the values");
   }
-  const userExists = await User.findOne({ email });
+  const userExists = await User.findOne({ phone });
   if (userExists) {
     res.status(400);
     throw new Error("User already exists");
   }
   const user = await new User({
     name,
-    email,
+    phone,
     password,
     pic,
   });
@@ -26,7 +26,7 @@ const registerUser = asyncHandler(async (req, res) => {
     res.status(201).json({
       _id: user._id,
       name: user.name,
-      email: user.email,
+      phone: user.phone,
       pic: user.pic,
       token: generateToken(user._id),
     });
@@ -37,22 +37,22 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 const authUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+  const { phone, password } = req.body;
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ phone });
 
   if (user && (await user.matchPassword(password))) {
     res.json({
       _id: user._id,
       name: user.name,
-      email: user.email,
+      phone: user.phone,
       isAdmin: user.isAdmin,
       pic: user.pic,
       token: generateToken(user._id),
     });
   } else {
     res.status(401);
-    throw new Error("Invalid Email or Password");
+    throw new Error("Invalid phone or Password");
   }
 });
 const allUsers = asyncHandler(async (req, res) => {
@@ -60,7 +60,7 @@ const allUsers = asyncHandler(async (req, res) => {
     ? {
         $or: [
           { name: { $regex: req.query.search, $options: "i" } },
-          { email: { $regex: req.query.search, $options: "i" } },
+          { phone: { $regex: req.query.search, $options: "i" } },
         ],
       }
     : {};
