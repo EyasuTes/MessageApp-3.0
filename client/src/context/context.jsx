@@ -15,25 +15,40 @@ export function ChatContextProvider({ children }) {
   const [selected, setSelected] = useState("");
   const [messages, setMessages] = useState([]);
   const [contacts, setContacts] = useState([]);
+  const [groupCreator, setGroupCreator] = useState(false);
+  const [contactCreator, setContactCreator] = useState(false);
+  const [user, setUser] = useState();
 
-  const getUser = () => {
-    let user = localStorage.getItem("userInfo");
-    if (user) {
-      user = JSON.parse(user);
-      return user;
-    } else {
-      return;
+  useEffect(() => {
+    let user1 = localStorage.getItem("userInfo");
+    if (user1) {
+      user1 = JSON.parse(user1);
+      setUser(user1);
     }
-  };
+  }, []);
   useEffect(() => {
     if (selected) {
       const room = selected._id;
       socket.emit("join_Room", room);
     }
   }, [selected]);
+  const userImg = (chat) => {
+    console.log(chat);
+    if (chat) {
+      const friend = chat.users.find((u) => u._id !== user._id);
+      console.log(friend);
+      return friend.pic;
+    }
+    return;
+  };
   return (
     <ChatContext.Provider
       value={{
+        groupCreator,
+        setGroupCreator,
+        contactCreator,
+        setContactCreator,
+        userImg,
         contacts,
         setContacts,
         socket,
@@ -43,7 +58,7 @@ export function ChatContextProvider({ children }) {
         setSelected,
         chats,
         setChats,
-        getUser,
+        user,
         api,
       }}
     >

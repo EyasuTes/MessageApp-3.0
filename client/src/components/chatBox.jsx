@@ -1,18 +1,27 @@
-import React, { useEffect, useState } from "react";
-import { User, PaperPlaneRight } from "phosphor-react";
+import React, { useEffect, useState, useRef } from "react";
+import { User, PaperPlaneRight, DotsThree, UsersThree } from "phosphor-react";
 import { useChatCart } from "../context/context";
 import axios from "axios";
 let selectedCompare;
 
 export default function ChatBox() {
-  const { selected, api, getUser, setMessages, messages, socket, contacts } =
-    useChatCart();
+  const {
+    userImg,
+    selected,
+    api,
+    user,
+    setMessages,
+    messages,
+    socket,
+    contacts,
+  } = useChatCart();
   const [userName, setUserName] = useState("");
+  const [showOptions, setShowOptions] = useState(false);
+  const optionsRef = useRef(null);
 
   // let userName;
   const [text, setText] = useState("");
   const sendMessage = async () => {
-    let user = getUser();
     if (user) {
       const headers = {
         Authorization: `Bearer ${user.token}`,
@@ -38,9 +47,9 @@ export default function ChatBox() {
       if (selected.isGroupChat) {
         setUserName(selected.chatName);
       } else {
-        let user = selected.users.find((user) => user._id !== getUser()._id);
+        let user1 = selected.users.find((u) => u._id !== user._id);
         for (let i = 0; i < contacts.length; i++) {
-          if (contacts[i].phone === user.phone) {
+          if (contacts[i].phone === user1.phone) {
             setUserName(contacts[i].name);
           }
         }
@@ -63,31 +72,67 @@ export default function ChatBox() {
       socket.off("message"); // detach the event listener when the component unmounts
     };
   });
+
   return (
     <div
       style={{ flex: 3 }}
       className="p-4 rounded-md bg-white flex flex-col m-2"
     >
       <div className="flex gap-2 items-center p-2 ">
-        <User size={32} />
-        <span>{userName}</span>
+        {selected && selected.isGroupChat ? (
+          <UsersThree size={32} />
+        ) : (
+          <img
+            style={{ objectFit: "cover" }}
+            className="h-12 w-12 rounded-full"
+            src={userImg(selected)}
+            alt=""
+          />
+        )}
+
+        <span className="flex-grow">{userName}</span>
+        <div
+          onClick={() => {
+            setShowOptions(!showOptions);
+          }}
+          className="cursor-pointer"
+        >
+          <DotsThree size={32} />
+        </div>
+        <div
+          className={`${
+            showOptions ? "h-12" : "opacity-0 h-0"
+          } absolute right-6 top-32 bg-white transition-all duration-500 rounded-md `}
+        >
+          <div className="hover:bg-blue-100">Remove User</div>
+          <div className="hover:bg-blue-100">Rename Group</div>
+        </div>
       </div>
 
-      <div className="flex-grow flex flex-col bg-blue-100 rounded-md">
+      <div className="flex-grow flex   flex-col bg-blue-100 rounded-md">
         <div className="flex-grow rounded-md"></div>
-        {messages &&
-          messages.map((message, index) => (
-            <div
-              className={`${
-                getUser()._id === message.sender._id
-                  ? "text-right"
-                  : "text-left"
-              }`}
-              key={index}
-            >
-              {message.content}
-            </div>
-          ))}
+        <div className="flex flex-col gap-2">
+          {messages &&
+            messages.map((message, index) => (
+              <div
+                className={`px-2 ${
+                  user._id === message.sender._id ? "text-right  " : "text-left"
+                }`}
+              >
+                <div
+                  style={{}}
+                  className={`inline-block ${
+                    user._id === message.sender._id
+                      ? "bg-blue-500  text-white p-2 rounded-md "
+                      : "bg-white p-2 rounded-md"
+                  }`}
+                  key={index}
+                >
+                  {message.content}
+                </div>
+              </div>
+            ))}
+        </div>
 
         <div className="flex gap-2 p-2">
           <input

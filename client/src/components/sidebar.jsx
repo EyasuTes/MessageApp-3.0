@@ -1,37 +1,43 @@
-import React, { useEffect, useState } from "react";
-import { CaretDown, DotsThree } from "phosphor-react";
-import io from "socket.io-client";
-const socket = io.connect("http://localhost:3001");
+import React, { useEffect, useState, useRef } from "react";
+import { DotsThreeVertical, UsersThree } from "phosphor-react";
+
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useChatCart } from "../context/context";
+import CreateContact from "../smallComponents/createContact";
+import CreateGroup from "../smallComponents/createGroup";
 export default function Sidebar() {
-  const [groupCreator, setGroupCreator] = useState(false);
-  const [contactCreator, setContactCreator] = useState(false);
-  const [phone, setPhone] = useState("");
-  const [contactName, setContactName] = useState("");
-  const [groupName, setGroupName] = useState("");
-  const [dropDown, setDropDown] = useState(false);
-  const [addedMembers, setAddedMembers] = useState([]);
-  const [showOptions, setShowOptions] = useState(false);
+  const navigate = useNavigate();
+
+  const [addOptions, setAddOptions] = useState(false);
+  const optionsRef = useRef(null);
+  const createContactRef = useRef(null);
+  const createGroupRef = useRef(null);
+
+  // const optionsRef = useRef(null);
 
   // const [searchContact, setSearchContact]= useState('')
   const {
+    groupCreator,
+    setGroupCreator,
+    contactCreator,
+    setContactCreator,
     api,
-    getUser,
+    user,
     chats,
     setSelected,
     selected,
     setMessages,
-    setChats,
-    setContacts,
+
     contacts,
+    userImg,
   } = useChatCart();
 
   function chatName(chat) {
     if (chat.isGroupChat) {
       return chat.chatName;
     }
-    const friend = chat.users.find((user) => user._id !== getUser()._id);
+    const friend = chat.users.find((u) => u._id !== user._id);
 
     for (let i = 0; i < contacts.length; i++) {
       if (contacts[i].phone === friend.phone) {
@@ -43,7 +49,6 @@ export default function Sidebar() {
   }
 
   async function getMessages() {
-    let user = getUser();
     if (user) {
       const headers = {
         Authorization: `Bearer ${user.token}`,
@@ -63,82 +68,85 @@ export default function Sidebar() {
     }
   }, [selected]);
 
-  const addChat = async () => {
-    let user = getUser();
-    const body = {
-      phone: phone,
+  function logout() {
+    localStorage.removeItem("userInfo");
+    navigate("/");
+  }
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (optionsRef.current && !optionsRef.current.contains(event.target)) {
+        setAddOptions(false);
+      }
+      if (
+        createContactRef.current &&
+        !createContactRef.current.contains(event.target)
+      ) {
+        setContactCreator(false);
+      }
+      if (
+        createGroupRef.current &&
+        !createGroupRef.current.contains(event.target)
+      ) {
+        setGroupCreator(false);
+      }
     };
-    if (user) {
-      const headers = {
-        Authorization: `Bearer ${user.token}`,
-        "content-type": "application/json",
-      };
-      await axios
-        .post(api + `/api/chats`, body, { headers })
-        .then((responce) => {
-          console.log(responce);
-          setChats((prevArray) => [...prevArray, responce.data]);
-        });
-      await axios
-        .post(
-          api + `/api/contact`,
-          { phone: phone, contactName: contactName },
-          { headers }
-        )
-        .then((responce) => {
-          setContacts((prevArray) => [...prevArray, responce.data]);
-        });
-    }
-  };
-  const makeGroup = async () => {
-    console.log(addedMembers);
-    let user = getUser();
-    const headers = {
-      Authorization: `Bearer ${user.token}`,
-      "content-type": "application/json",
+
+    document.addEventListener("mousedown", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
     };
-    await axios
-      .post(
-        api + "/api/chats/group",
-        { members: addedMembers, name: groupName },
-        { headers }
-      )
-      .then((responce) => {
-        console.log(responce);
-      });
-  };
-  const AddMembers = (contact) => {
-    setAddedMembers((prev) => [...prev, contact]);
-  };
+  }, []);
+
   return (
     <div
       style={{ flex: 2 }}
       className="flex flex-col rounded-md m-2 bg-white flex-1"
     >
-      <div className="flex items-center justify-between p-2">
+      <div className="flex relative items-center justify-between p-2 ">
         <div className="text-2xl font-bold ">Chats</div>
         <div
-          onClick={() => {
-            setAddedMembers([]);
-            setGroupCreator(!groupCreator);
-          }}
-          className="hover:bg-blue-200 hover:text-blue-500 cursor-pointer bg-blue-500 text-white p-1 flex items-center justify-center gap-2 rounded-md "
+          className="hover:bg-blue-100 rounded-md"
+          onClick={() => setAddOptions(!addOptions)}
         >
-          Add Group Chat <span className="text-2xl ">+</span>
+          <DotsThreeVertical size={32} />
+        </div>
+        <div
+          ref={optionsRef}
+          className={`${
+            addOptions ? " scale-100" : " scale-0"
+          } rounded-md transition-all origin-top-right duration-200 absolute right-0 bg-blue-100 top-12 shadow-lg`}
+        >
+          <div
+            onClick={() => {
+              setContactCreator(!contactCreator);
+              setGroupCreator(false);
+            }}
+            className="p-2  hover:bg-blue-200"
+          >
+            Add Contact
+          </div>
+          <div
+            onClick={() => {
+              // setAddedMembers([]);
+              setGroupCreator(!groupCreator);
+              setContactCreator(false);
+            }}
+            className="p-2  hover:bg-blue-200"
+          >
+            Add Group Chat
+          </div>
         </div>
       </div>
-      <div
-        onClick={() => setContactCreator(!contactCreator)}
-        className="hover:bg-blue-200 hover:text-blue-500 cursor-pointer bg-blue-500 text-white p-1 flex items-center justify-center gap-2 rounded-md "
-      >
-        Add Contact
-      </div>
-      <div>
+
+      <div className="mt-4 flex flex-col gap-2 flex-grow">
         {chats &&
           chats.map((chat) => (
             <div
-              className={`flex ${
-                selected._id === chat._id ? " bg-blue-500 text-white" : ""
+              className={`flexborder-blue-100 p-2 ${
+                selected._id === chat._id
+                  ? " bg-blue-100 border-l-4 border-blue-500 border-rounded-md"
+                  : " border-b-2 border-t-2 "
               }`}
               key={chat._id}
             >
@@ -146,122 +154,45 @@ export default function Sidebar() {
                 onClick={() => {
                   setSelected(chat);
                 }}
-                className="flex-grow"
+                className="flex items-center gap-2 "
               >
-                {chatName(chat)}
-              </div>
-              <div className={`${showOptions ? "" : "hidden"}`}>
-                <div>Rename</div>
-                <div>Remove</div>
-                <div>Remove Users</div>
-              </div>
-              <div
-                onClick={() => {
-                  setShowOptions(!showOptions);
-                }}
-                className="cursor-pointer"
-              >
-                <DotsThree size={32} />
+                {chat.isGroupChat ? (
+                  <UsersThree size={32} />
+                ) : (
+                  <img
+                    style={{ objectFit: "cover" }}
+                    className="h-12 w-12 rounded-full"
+                    src={userImg(chat)}
+                    alt=""
+                  />
+                )}
+
+                <div>{chatName(chat)}</div>
               </div>
             </div>
           ))}
       </div>
-      <div
-        className={` fixed flex flex-col items-center top-1/2 left-1/2 bg-blue-200 w-72 h-72 transform -translate-x-1/2 -translate-y-1/2 ${
-          groupCreator ? "" : "hidden"
-        }`}
-      >
-        <div
-          className={`absolute bg-white top-36 w-52 ${
-            dropDown ? "" : "hidden"
-          }`}
-        >
-          {contacts &&
-            contacts.map((contact) => (
-              <div
-                onClick={() => {
-                  AddMembers(contact);
-                }}
-                className="hover:bg-blue-100 "
-                key={contact._id}
-              >
-                {contact.name}
-              </div>
-            ))}
-        </div>
-        <div className="text-center text-2xl">Make A Group</div>
-        <div className="flex flex-col justify-center mt-12 gap-2">
-          <input
-            type="text"
-            placeholder="Group Name"
-            value={groupName}
-            onChange={(e) => {
-              setGroupName(e.target.value);
-            }}
+      <div className="flex justify-center gap-4 items-center">
+        <div className="flex  items-center">
+          <img
+            style={{ objectFit: "cover" }}
+            className="rounded-full w-12 h-12"
+            src={user ? user.pic : ""}
+            alt=""
           />
-          <div className="flex">
-            <input
-              className="rounded-sm"
-              placeholder="Add Members"
-              type="text"
-              // onChange={(e) => {
-              //   SearchContact(e.target.value);
-              // }}
-            />
-            <div
-              onClick={(e) => setDropDown(!dropDown)}
-              className="bg-blue-500 text-white rounded-sm"
-            >
-              <CaretDown size={32} />
-            </div>
-          </div>
+          <div>{user ? user.name : ""}</div>
         </div>
-        <div className="flex-grow">
-          {addedMembers &&
-            addedMembers.map((members) => (
-              <div key={members._id}>{members.name}</div>
-            ))}
-        </div>
-        <div
-          onClick={() => makeGroup()}
-          className="text-white bg-blue-500 text-center mb-4 rounded-md p-2 "
-        >
-          Create
+
+        <div onClick={logout} className="bg-blue-100 p-2 ">
+          logout
         </div>
       </div>
-      <div
-        className={`fixed flex flex-col items-center top-1/2 left-1/2 bg-blue-200 w-72 h-72 transform -translate-x-1/2 -translate-y-1/2 ${
-          contactCreator ? "" : "hidden"
-        }`}
-      >
-        <div className="text-center text-2xl">Create Contact</div>
-        <div className="flex flex-col justify-center mt-12 gap-2">
-          <input
-            placeholder="Phone Number"
-            className="rounded-md"
-            type="text"
-            value={phone}
-            onChange={(e) => {
-              setPhone(e.target.value);
-            }}
-          />
-          <input
-            placeholder="Contact Name"
-            className="rounded-md"
-            type="text"
-            value={contactName}
-            onChange={(e) => {
-              setContactName(e.target.value);
-            }}
-          />
-        </div>
-        <div className="flex-grow"></div>
-        <div
-          onClick={() => addChat()}
-          className="text-white bg-blue-500 text-center mb-4 rounded-md p-2 "
-        >
-          Create
-        </div>
+      <div ref={createGroupRef}>
+        {groupCreator ? <CreateGroup></CreateGroup> : ""}
+      </div>
+
+      <div ref={createContactRef}>
+        {contactCreator ? <CreateContact></CreateContact> : ""}
       </div>
     </div>
   );

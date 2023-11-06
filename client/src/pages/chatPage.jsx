@@ -6,12 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { useChatCart } from "../context/context";
 
 export default function ChatPage() {
-  const { getUser, setChats, setContacts } = useChatCart();
+  const { user, setChats, setContacts } = useChatCart();
+
   const navigate = useNavigate();
 
   const fetchChats = async () => {
     const api = import.meta.env.VITE_API_KEY;
-    let user = getUser();
+
     if (user) {
       const token = user.token;
       const headers = {
@@ -45,7 +46,7 @@ export default function ChatPage() {
     fetchChats();
   }, []);
   return (
-    <div style={{ height: "93vh" }} className="flex w-full ">
+    <div style={{ height: "100vh" }} className="flex  ">
       <Sidebar></Sidebar>
       <ChatBox></ChatBox>
     </div>

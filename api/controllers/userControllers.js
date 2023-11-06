@@ -3,7 +3,8 @@ const User = require("../models/userModel");
 const generateToken = require("../config/generateToken");
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, phone, password, pic } = req.body;
+  const { name, phone, password } = req.body;
+  let { pic } = req.body;
   if (!name || !phone || !password) {
     res.status(400);
     throw new Error("Please Enter all the values");
@@ -12,6 +13,10 @@ const registerUser = asyncHandler(async (req, res) => {
   if (userExists) {
     res.status(400);
     throw new Error("User already exists");
+  }
+  if (!pic) {
+    pic =
+      "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg";
   }
   const user = await new User({
     name,

@@ -8,7 +8,7 @@ function App() {
   return (
     <div className="bg-blue-300 h-screen">
       <Router>
-        <Navbar></Navbar>
+        {/* <Navbar></Navbar> */}
         <Routes>
           <Route path="/" element={<HomePage />}></Route>
           <Route path="/chats" element={<ChatPage />}></Route>
