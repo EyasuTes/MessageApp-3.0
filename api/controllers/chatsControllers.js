@@ -6,9 +6,16 @@ const Contact = require("../models/contactModel");
 const accessChat = asyncHandler(async (req, res) => {
   const { phone } = req.body;
   const user = await User.find({ phone });
-  console.log(user[0]._id);
+
+  if (!user[0]) {
+    console.log("no user exists");
+    return res
+      .status(400)
+      .json({ error: "No user exists with that Phone number" });
+  }
   const userID = user[0]._id;
-  if (!userID) {
+  if (userID === req.user._id) {
+    console.log("this is your own number");
     return res.sendStatus(400);
   }
 
@@ -94,7 +101,7 @@ const createGroupChat = asyncHandler(async (req, res) => {
   }
 
   if (!users || !req.body.name) {
-    return res.status(400).send({ message: "Please Fill all the feilds" });
+    return res.status(400).send("Please Fill all the feilds");
   }
 
   // var users = JSON.parse(req.body.users);

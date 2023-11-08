@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { DotsThreeVertical, UsersThree } from "phosphor-react";
+import { DotsThreeVertical, UsersThree, User } from "phosphor-react";
 
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -10,6 +10,7 @@ export default function Sidebar() {
   const navigate = useNavigate();
 
   const [addOptions, setAddOptions] = useState(false);
+  const [renameDrop, setRenameDrop] = useState(false);
   const optionsRef = useRef(null);
   const createContactRef = useRef(null);
   const createGroupRef = useRef(null);
@@ -37,11 +38,13 @@ export default function Sidebar() {
     if (chat.isGroupChat) {
       return chat.chatName;
     }
-    const friend = chat.users.find((u) => u._id !== user._id);
-
-    for (let i = 0; i < contacts.length; i++) {
-      if (contacts[i].phone === friend.phone) {
-        return contacts[i].name;
+    const friend = chat.users.find((u) => u._id !== user.current._id);
+    console.log(contacts);
+    if (contacts) {
+      for (let i = 0; i < contacts.length; i++) {
+        if (contacts[i].phone === friend.phone) {
+          return contacts[i].name;
+        }
       }
     }
 
@@ -49,9 +52,9 @@ export default function Sidebar() {
   }
 
   async function getMessages() {
-    if (user) {
+    if (user.current) {
       const headers = {
-        Authorization: `Bearer ${user.token}`,
+        Authorization: `Bearer ${user.current.token}`,
         "content-type": "application/json",
       };
 
@@ -100,13 +103,17 @@ export default function Sidebar() {
 
   return (
     <div
-      style={{ flex: 2 }}
-      className="flex flex-col rounded-md m-2 bg-white flex-1"
+      style={{
+        flex: 2,
+      }}
+      className="flex flex-col rounded-md m-2 bg-dark flex-1"
     >
       <div className="flex relative items-center justify-between p-2 ">
-        <div className="text-2xl font-bold ">Chats</div>
+        <div className="p-2 rounded-md text-2xl font-bold text-white bg-gradient-to-r from-secondary to-primary">
+          MernChatApp
+        </div>
         <div
-          className="hover:bg-blue-100 rounded-md"
+          className="hover:bg-blue-100 rounded-md text-white"
           onClick={() => setAddOptions(!addOptions)}
         >
           <DotsThreeVertical size={32} />
@@ -122,7 +129,7 @@ export default function Sidebar() {
               setContactCreator(!contactCreator);
               setGroupCreator(false);
             }}
-            className="p-2  hover:bg-blue-200"
+            className="p-2  hover:bg-blue-200 "
           >
             Add Contact
           </div>
@@ -132,7 +139,7 @@ export default function Sidebar() {
               setGroupCreator(!groupCreator);
               setContactCreator(false);
             }}
-            className="p-2  hover:bg-blue-200"
+            className="p-2  hover:bg-blue-200 "
           >
             Add Group Chat
           </div>
@@ -143,47 +150,72 @@ export default function Sidebar() {
         {chats &&
           chats.map((chat) => (
             <div
-              className={`flexborder-blue-100 p-2 ${
+              onClick={() => {
+                setSelected(chat);
+              }}
+              className={` text-white flex border-dark-alt p-2 ${
                 selected._id === chat._id
-                  ? " bg-blue-100 border-l-4 border-blue-500 border-rounded-md"
+                  ? " text-white bg-gradient-to-r from-primary to-secondary"
                   : " border-b-2 border-t-2 "
               }`}
               key={chat._id}
             >
-              <div
-                onClick={() => {
-                  setSelected(chat);
-                }}
-                className="flex items-center gap-2 "
-              >
-                {chat.isGroupChat ? (
-                  <UsersThree size={32} />
-                ) : (
-                  <img
-                    style={{ objectFit: "cover" }}
-                    className="h-12 w-12 rounded-full"
-                    src={userImg(chat)}
-                    alt=""
-                  />
-                )}
+              <div className="flex items-center gap-2 ">
+                <div className="flex-grow flex items-center gap-2">
+                  {chat.isGroupChat ? (
+                    <div className="">
+                      <UsersThree size={32} />
+                    </div>
+                  ) : (
+                    // <img
+                    //   style={{ objectFit: "cover" }}
+                    //   className="h-12 w-12 rounded-full"
+                    //   src={userImg(chat)}
+                    //   alt=""
+                    // />
+                    <div className="">
+                      <User size={32} />
+                    </div>
+                  )}
 
-                <div>{chatName(chat)}</div>
+                  <div className="">{chatName(chat)}</div>
+                </div>
               </div>
             </div>
           ))}
       </div>
       <div className="flex justify-center gap-4 items-center">
         <div className="flex  items-center">
-          <img
+          {/* <img
             style={{ objectFit: "cover" }}
             className="rounded-full w-12 h-12"
-            src={user ? user.pic : ""}
+            src={user.current ? user.current.pic : ""}
             alt=""
-          />
-          <div>{user ? user.name : ""}</div>
+          /> */}
+          <div className="bg-white rounded-full p-2">
+            <User size={32} />
+          </div>
+
+          <div
+            style={{
+              background: `linear-gradient(to left, rgb(var(--primary)), rgb(var(--secondary)))`,
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              color: "transparent",
+            }}
+            className="font-bold text-2xl"
+          >
+            {user.current ? user.current.name : ""}
+          </div>
         </div>
 
-        <div onClick={logout} className="bg-blue-100 p-2 ">
+        <div
+          style={{
+            backgroundImage: `linear-gradient(to left, rgb(var(--primary)), rgb(var(--secondary)))`,
+          }}
+          onClick={logout}
+          className="text-white p-2 rounded-md"
+        >
           logout
         </div>
       </div>

@@ -4,7 +4,7 @@ const generateToken = require("../config/generateToken");
 
 const registerUser = asyncHandler(async (req, res) => {
   const { name, phone, password } = req.body;
-  let { pic } = req.body;
+  // let { pic } = req.body;
   if (!name || !phone || !password) {
     res.status(400);
     throw new Error("Please Enter all the values");
@@ -14,15 +14,15 @@ const registerUser = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("User already exists");
   }
-  if (!pic) {
-    pic =
-      "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg";
-  }
+  // if (!pic) {
+  //   pic =
+  //     "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg";
+  // }
   const user = await new User({
     name,
     phone,
     password,
-    pic,
+    // pic,
   });
 
   if (user) {
@@ -32,7 +32,7 @@ const registerUser = asyncHandler(async (req, res) => {
       _id: user._id,
       name: user.name,
       phone: user.phone,
-      pic: user.pic,
+      // pic: user.pic,
       token: generateToken(user._id),
     });
   } else {
@@ -40,7 +40,20 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error("Failed to Create the user");
   }
 });
-
+// const addPic = asyncHandler(async (req, res) => {
+//   const { pics } = req.body;
+//   console.log(pics);
+//   if (pics) {
+//     const user = await User.findOne({ _id: req.user._id });
+//     if (user) {
+//       user.pic = pics;
+//       await user.save();
+//       res.status(200).send(user);
+//     }
+//   } else {
+//     res.status(400).send("pic is empty");
+//   }
+// });
 const authUser = asyncHandler(async (req, res) => {
   const { phone, password } = req.body;
 
@@ -52,7 +65,7 @@ const authUser = asyncHandler(async (req, res) => {
       name: user.name,
       phone: user.phone,
       isAdmin: user.isAdmin,
-      pic: user.pic,
+      // pic: user.pic,
       token: generateToken(user._id),
     });
   } else {

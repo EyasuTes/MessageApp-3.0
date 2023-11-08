@@ -6,7 +6,12 @@ import Navbar from "./components/navbar";
 
 function App() {
   return (
-    <div className="bg-blue-300 h-screen">
+    <div
+      // style={{
+      //   backgroundImage: `linear-gradient(to left, rgb(var(--primary)), rgb(var(--secondary)))`,
+      // }}
+      className=" h-screen bg-gradient-to-r from-secondary to-primary"
+    >
       <Router>
         {/* <Navbar></Navbar> */}
         <Routes>

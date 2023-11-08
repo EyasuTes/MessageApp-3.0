@@ -32,5 +32,17 @@ const getContacts = asyncHandler(async (req, res) => {
     throw new Error(error.message);
   }
 });
+const renameContact = asyncHandler(async (req, res) => {
+  const { phone, name } = req.body;
 
-module.exports = { addContact, getContacts };
+  const contact = await Contact.findOne({ phone: phone });
+  console.log(contact);
+  if (contact) {
+    contact.name = name;
+    await contact.save();
+    res.status(200).json(contact);
+  }
+  res.status(400).json({ error: "contact not found" });
+});
+
+module.exports = { addContact, getContacts, renameContact };

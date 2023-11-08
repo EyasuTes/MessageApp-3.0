@@ -16,11 +16,11 @@ export default function HomePage() {
     <div>
       {isRegistered ? (
         <div>
-          <Login setIsRegistered={setIsRegistered} />
+          <SignUp setIsRegistered={setIsRegistered} />
         </div>
       ) : (
         <div>
-          <SignUp setIsRegistered={setIsRegistered} />
+          <Login setIsRegistered={setIsRegistered} />
         </div>
       )}
     </div>

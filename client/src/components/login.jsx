@@ -5,6 +5,7 @@ export default function SignUp({ setIsRegistered }) {
   const navigate = useNavigate();
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState();
 
   const handleSubmit = async () => {
     if (!phone || !password) {
@@ -30,34 +31,45 @@ export default function SignUp({ setIsRegistered }) {
       await localStorage.setItem("userInfo", JSON.stringify(data));
 
       navigate("/chats");
+      setError("");
     } catch (error) {
-      console.log(error);
+      console.log(error.response.data.message);
+      setError(error.response.data.message);
     }
   };
 
   return (
-    <div className="p-4 gap-4 flex flex-col fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-      <div className="bg-blue-300 p-2 rounded-md">
-        <h1 className="text-center">Chat App</h1>
+    <div className="bg-dark p-4 gap-4 flex flex-col fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+      <div className="bg-dark-alt p-2 text-white font-bold rounded-md">
+        <h1 className="text-center ">Chat App</h1>
       </div>
-      <div className="bg-blue-300 p-8 flex flex-col gap-8 rounded-md">
-        <div className="flex justify-around ">
+      <div className="bg-dark-alt p-8 flex flex-col gap-8 rounded-md">
+        <div className="flex justify-around text-white cursor-pointer">
           <div
             onClick={() => {
-              setIsRegistered(true);
+              setIsRegistered(false);
             }}
-            className={"rounded-xl bg-white bg-blue-500 w-32 text-center"}
+            className={
+              "rounded-xl bg-gradient-to-r  from-secondary to-primary w-32 text-center"
+            }
           >
             Login
           </div>
           <div
             onClick={() => {
-              setIsRegistered(false);
+              setIsRegistered(true);
             }}
           >
             Sign Up
           </div>
         </div>
+        {error ? (
+          <div className="text-red-500 font-bold flex justify-center">
+            {error}
+          </div>
+        ) : (
+          ""
+        )}
 
         <div className="flex flex-col gap-2 text-xl">
           <input
@@ -81,7 +93,7 @@ export default function SignUp({ setIsRegistered }) {
         </div>
         <button
           onClick={handleSubmit}
-          className="bg-blue-500 rounded-sm text-white py-1"
+          className=" bg-gradient-to-r from-secondary to-primary rounded-sm  py-1"
         >
           LogIn
         </button>
